@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class AddTodoItemActivity : AppCompatActivity() {
+class AddTodoIListActivity : AppCompatActivity() {
 
     private lateinit var dbHelper: TodoDatabaseHelper
     private var listIdFk: Int = -1 // Initialize to a default value
@@ -23,7 +23,7 @@ class AddTodoItemActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_todo_item)
+        setContentView(R.layout.activity_add_todo_list)
 
         // Set the toolbar title directly using supportActionBar
         supportActionBar?.title = "Add Item"

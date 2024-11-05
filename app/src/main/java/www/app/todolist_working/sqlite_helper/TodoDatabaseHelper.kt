@@ -75,7 +75,7 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     fun getAllTodoItems(): List<TodoItem> {
         val itemList = mutableListOf<TodoItem>()
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM todo_items", null)
+        val cursor = db.rawQuery("SELECT * FROM todo_items ORDER BY due_date ASC", null)
 
         if (cursor.moveToFirst()) {
             do {
@@ -136,37 +136,6 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     }
 
 
-//    @SuppressLint("Range")
-//    fun getAllTodoItems(): List<TodoItem> {
-//        val itemList = mutableListOf<TodoItem>()
-//        val db = this.readableDatabase
-//        val cursor = db.rawQuery("SELECT * FROM todo_items", null)
-//
-//        if (cursor.moveToFirst()) {
-//            do {
-//
-//                Log.d("Database", "Item ID Index: ${cursor.getColumnIndex("item_id")}")
-//                Log.d("Database", "Name Index: ${cursor.getColumnIndex("name")}")
-//                Log.d("Database", "Due Date Index: ${cursor.getColumnIndex("due_date")}")
-//                Log.d("Database", "Completed Index: ${cursor.getColumnIndex("completed")}")
-//                Log.d("Database", "List ID FK Index: ${cursor.getColumnIndex("list_id_fk")}")
-//
-//
-//                val itemId = cursor.getInt(cursor.getColumnIndex("item_id"))
-//                val name = cursor.getString(cursor.getColumnIndex("name"))
-//                val dueDate = cursor.getString(cursor.getColumnIndex("due_date"))
-//                val completed = cursor.getInt(cursor.getColumnIndex("completed"))
-//                val listIdFk = cursor.getInt(cursor.getColumnIndex("list_id_fk"))
-//
-//                val todoItem = TodoItem(itemId, name, dueDate, completed, listIdFk)
-//                itemList.add(todoItem)
-//            } while (cursor.moveToNext())
-//        }
-//        cursor.close()
-//        db.close()
-//        return itemList
-//    }
-
 
     @SuppressLint("Range")
     fun logTableSchema() {
@@ -181,6 +150,17 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         }
         cursor.close()
         db.close()
+    }
+
+    fun getNearestDueDateForList(listId: Int): String? {
+        val db = this.readableDatabase
+        val query = "SELECT due_date FROM todo_items WHERE item_id = ? ORDER BY due_date ASC LIMIT 1"
+        db.rawQuery(query, arrayOf(listId.toString())).use { cursor ->
+            if (cursor.moveToFirst()) {
+                return cursor.getString(cursor.getColumnIndexOrThrow("due_date"))
+            }
+        }
+        return null
     }
 
 

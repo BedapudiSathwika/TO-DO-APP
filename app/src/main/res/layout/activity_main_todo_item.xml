@@ -13,13 +13,25 @@
         android:orientation="vertical"
         android:paddingTop="?attr/actionBarSize">
 
+        <TextView
+            android:id="@+id/todoCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total Items: 0"/>
+
+        <TextView
+            android:id="@+id/completedCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Completed Items: 0"/>
+
 
         <Button
             android:id="@+id/btnAddList"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Add New ToDo List" />
+            android:text="Add New To Do Item" />
 
         <TextView
             android:id="@android:id/empty"
