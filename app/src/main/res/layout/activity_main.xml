@@ -10,7 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="?attr/actionBarSize">
 
         <Button
             android:id="@+id/btnAddList"
@@ -19,10 +20,20 @@
             android:layout_gravity="center"
             android:text="Add New List" />
 
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="NO ITEM"
+            android:padding="10dp"
+            android:gravity="center"
+            android:visibility="gone" />
+
         <ListView
             android:id="@+id/listViewTodoLists"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:transcriptMode="alwaysScroll"/>
 
     </LinearLayout>
 

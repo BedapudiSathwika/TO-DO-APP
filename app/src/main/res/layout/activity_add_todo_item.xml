@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:gravity="center"
         android:padding="16dp">
 
         <TextView
@@ -30,23 +31,26 @@
             android:inputType="text"
             android:padding="8dp" />
 
-        <EditText
-            android:id="@+id/etDueDate"
+        <TextView
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Due Date (Optional)"
-            android:inputType="date"
-            android:padding="8dp"
-            android:focusable="false"
-            android:clickable="true" />
+            android:text="Due Date (Optional)" />
+        <TextView
+            android:id="@+id/tvDueDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="mm//dd/yyyy"
+            android:padding="15dp"
+            android:background="@drawable/backborder"/>
 
         <Button
             android:id="@+id/btnAddItem"
-            android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Add Item"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="16dp" />
+            android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
 

@@ -1,5 +1,7 @@
 package www.app.todolist_working.sqlite_helper
 
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -48,5 +50,37 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TODO_ITEMS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TODO_LISTS")
         onCreate(db)
+    }
+
+
+    // Method to insert a new todo list
+    fun insertTodoItem(itemName: String, dueDate: String): Long {
+        val db = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put(COLUMN_ITEM_NAME, itemName)
+            put(COLUMN_ITEM_DUE_DATE, dueDate) // If your table supports due date
+        }
+        val result = db.insert(TABLE_TODO_ITEMS, null, contentValues)
+        db.close()
+        return result // Returns the row ID of the newly inserted row, or -1 if an error occurred
+    }
+
+    // Method to get all todo lists
+    @SuppressLint("Range")
+    fun getTodoLists(): List<String> {
+        val todoLists = mutableListOf<String>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_TODO_LISTS", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val listName = cursor.getString(cursor.getColumnIndex(COLUMN_LIST_NAME))
+                todoLists.add(listName)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return todoLists // Returns the list of todo list names
     }
 }
