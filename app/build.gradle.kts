@@ -5,11 +5,12 @@ plugins {
 
 android {
     namespace = "www.app.todolist_working"
-    compileSdk = 34
+    compileSdk = 35
+
 
     defaultConfig {
         applicationId = "www.app.todolist_working"
-        minSdk = 27
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -33,6 +34,7 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    //buildToolsVersion = "34.0.0"
 }
 
 dependencies {
