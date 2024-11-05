@@ -94,6 +94,17 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return itemList
     }
 
+    fun updateTodoItem(todoItem: TodoItem) {
+        val db = this.writableDatabase
+        val contentValues = ContentValues()
+        contentValues.put("completed", todoItem.completed)
+
+        // Update the todo item in the database
+        db.update("todo_items", contentValues, "item_id = ?", arrayOf(todoItem.itemId.toString()))
+        db.close()
+    }
+
+
 //    @SuppressLint("Range")
 //    fun getAllTodoItems(): List<TodoItem> {
 //        val itemList = mutableListOf<TodoItem>()

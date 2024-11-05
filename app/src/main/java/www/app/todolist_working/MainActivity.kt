@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import www.app.todolist_working.custom_adapter.TodoItemAdapter
 import www.app.todolist_working.data_class.TodoItem
 import www.app.todolist_working.sqlite_helper.TodoDatabaseHelper
 
@@ -56,11 +57,33 @@ class MainActivity : AppCompatActivity() {
             listViewTodoItems.visibility = View.VISIBLE
             emptyView.visibility = View.GONE
 
-            // Set up adapter for ListView
-            val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, todoItems.map { "${it.name} - Due: ${it.dueDate}" })
+            // Set up custom adapter for ListView, passing the dbHelper
+            val adapter = TodoItemAdapter(this, todoItems, dbHelper)
             listViewTodoItems.adapter = adapter
         }
     }
+
+
+
+//    private fun loadTodoItems() {
+//        // Fetch all todo items from the database
+//        val todoItems: List<TodoItem> = dbHelper.getAllTodoItems()
+//
+//        val listViewTodoItems = findViewById<ListView>(R.id.listViewTodoLists)
+//        val emptyView = findViewById<TextView>(android.R.id.empty)
+//
+//        if (todoItems.isEmpty()) {
+//            listViewTodoItems.visibility = View.GONE
+//            emptyView.visibility = View.VISIBLE
+//        } else {
+//            listViewTodoItems.visibility = View.VISIBLE
+//            emptyView.visibility = View.GONE
+//
+//            // Set up adapter for ListView
+//            val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, todoItems.map { "${it.name} - Due: ${it.dueDate}" })
+//            listViewTodoItems.adapter = adapter
+//        }
+//    }
 
 
 

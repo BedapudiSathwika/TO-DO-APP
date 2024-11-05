@@ -4,7 +4,7 @@ data class TodoItem(
     val itemId: Int,
     val name: String,
     val dueDate: String,
-    val completed: Int,
+    var completed: Int,
     val listIdFk: Int
 )
 
