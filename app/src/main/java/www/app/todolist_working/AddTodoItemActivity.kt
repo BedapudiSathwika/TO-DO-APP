@@ -2,10 +2,9 @@ package www.app.todolist_working
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import android.widget.Button
-import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -18,8 +17,9 @@ import java.util.Locale
 class AddTodoItemActivity : AppCompatActivity() {
 
     private lateinit var dbHelper: TodoDatabaseHelper
+    private var listIdFk: Int = -1 // Initialize to a default value
 
-    val cldr: Calendar = Calendar.getInstance()
+    private val cldr: Calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,12 +29,13 @@ class AddTodoItemActivity : AppCompatActivity() {
         supportActionBar?.title = "Add Item"
 
         // add back arrow to toolbar
-        if (supportActionBar != null){
-            supportActionBar?.setDisplayHomeAsUpEnabled(true);
-            supportActionBar?.setDisplayShowHomeEnabled(true);
-        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         dbHelper = TodoDatabaseHelper(this)
+
+        // Get the listIdFk from intent extras
+        listIdFk = intent.getIntExtra("LIST_ID", -1)
 
         val etItemName = findViewById<EditText>(R.id.etItemName)
         val tvDueDate = findViewById<TextView>(R.id.tvDueDate)
@@ -45,24 +46,25 @@ class AddTodoItemActivity : AppCompatActivity() {
             showDatePickerDialog(tvDueDate)
         }
 
-
         // Add item button click listener
         btnAddItem.setOnClickListener {
-            val itemName = etItemName.text.toString()
-            val dueDate = tvDueDate.text.toString()
+            val itemName = etItemName.text.toString().trim()
+            val dueDate = tvDueDate.text.toString().trim()
 
-            if (itemName.isNotBlank()) {
-                // Insert the item into the database
-                val result = dbHelper.insertTodoItem(itemName, dueDate)
+            if(itemName == "") {
 
+                Toast.makeText(this, "Please input a name for the note", Toast.LENGTH_SHORT).show()
+
+            } else if (listIdFk != -1) { // Ensure that the list ID is valid
+                val result = dbHelper.insertTodoItem(itemName, dueDate, listIdFk) // Include listIdFk here
                 if (result != -1L) {
-                    Toast.makeText(this, "Item added successfully", Toast.LENGTH_SHORT).show()
-                    finish() // Close this activity and return to previous one
+                    Toast.makeText(this, "Todo item added successfully!", Toast.LENGTH_SHORT).show()
+                    finish() // Optionally finish this activity to go back
                 } else {
-                    Toast.makeText(this, "Failed to add item", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error adding todo item.", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "Please enter an item name", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Invalid List ID.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -87,12 +89,10 @@ class AddTodoItemActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                // Navigate back to the previous screen
-                finish()
+                finish() // Navigate back to the previous screen
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 }
