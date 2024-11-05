@@ -39,7 +39,7 @@
         android:id="@+id/btnAddMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add"
+        android:text="+ item"
         android:textAllCaps="false"/>
 
 </LinearLayout>

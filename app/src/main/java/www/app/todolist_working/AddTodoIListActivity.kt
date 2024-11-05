@@ -19,14 +19,12 @@ class AddTodoIListActivity : AppCompatActivity() {
     private lateinit var dbHelper: TodoDatabaseHelper
     private var listIdFk: Int = -1 // Initialize to a default value
 
-    private val cldr: Calendar = Calendar.getInstance()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_todo_list)
 
         // Set the toolbar title directly using supportActionBar
-        supportActionBar?.title = "Add Item"
+        supportActionBar?.title = "Add ToDo List"
 
         // add back arrow to toolbar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -38,25 +36,18 @@ class AddTodoIListActivity : AppCompatActivity() {
         listIdFk = intent.getIntExtra("LIST_ID", -1)
 
         val etItemName = findViewById<EditText>(R.id.etItemName)
-        val tvDueDate = findViewById<TextView>(R.id.tvDueDate)
         val btnAddItem = findViewById<Button>(R.id.btnAddItem)
-
-        // Show DatePickerDialog when tvDueDate is clicked
-        tvDueDate.setOnClickListener {
-            showDatePickerDialog(tvDueDate)
-        }
 
         // Add item button click listener
         btnAddItem.setOnClickListener {
             val itemName = etItemName.text.toString().trim()
-            val dueDate = tvDueDate.text.toString().trim()
 
             if(itemName == "") {
 
                 Toast.makeText(this, "Please input a name for the note", Toast.LENGTH_SHORT).show()
 
             } else if (listIdFk != -1) { // Ensure that the list ID is valid
-                val result = dbHelper.insertTodoItem(itemName, dueDate, listIdFk) // Include listIdFk here
+                val result = dbHelper.insertTodoList(itemName) // Include listIdFk here
                 if (result != -1L) {
                     Toast.makeText(this, "Todo item added successfully!", Toast.LENGTH_SHORT).show()
                     finish() // Optionally finish this activity to go back
@@ -67,23 +58,6 @@ class AddTodoIListActivity : AppCompatActivity() {
                 Toast.makeText(this, "Invalid List ID.", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private fun showDatePickerDialog(tvDueDate: TextView) {
-        val day = cldr.get(Calendar.DAY_OF_MONTH)
-        val month = cldr.get(Calendar.MONTH)
-        val year = cldr.get(Calendar.YEAR)
-
-        val datePickerDialog = DatePickerDialog(
-            this,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                cldr.set(selectedYear, selectedMonth, selectedDay)
-                val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-                tvDueDate.text = dateFormat.format(cldr.time)
-            },
-            year, month, day
-        )
-        datePickerDialog.show()
     }
 
     //Back button

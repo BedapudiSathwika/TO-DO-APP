@@ -2,7 +2,6 @@ package www.app.todolist_working
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText

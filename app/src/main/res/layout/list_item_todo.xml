@@ -37,8 +37,26 @@
 
     <ImageView
         android:id="@+id/imageviewDelete"
+        android:layout_gravity="center"
+        android:layout_marginStart="10dp"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:background="@drawable/delete_24"/>
+
+    <ImageView
+        android:id="@+id/imageviewEdit"
+        android:layout_gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/baseline_edit_24"/>
+
+    <ImageView
+        android:id="@+id/imageviewMove"
+        android:layout_marginStart="10dp"
+        android:layout_gravity="center"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/move_24"/>
 
 </LinearLayout>

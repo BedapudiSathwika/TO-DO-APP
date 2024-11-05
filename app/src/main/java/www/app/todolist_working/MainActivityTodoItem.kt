@@ -25,12 +25,19 @@ class MainActivityTodoItem : AppCompatActivity(), OnTodoItemChangeListener {
     private lateinit var todoCounter: TextView
     private lateinit var completedCounter: TextView
 
+    private var listIdFk: Int = -1 // Initialize to a default value
+    private var listname: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_todo_item) // Ensure this matches your XML file name
 
+        // Get the listIdFk from intent extras
+        listIdFk = intent.getIntExtra("LIST_ID", -1)
+        listname = intent.getStringExtra("LIST_NAME").toString()
+
         // Set the toolbar title directly using supportActionBar
-        supportActionBar?.title = "Add To Do Item"
+        supportActionBar?.title = "$listname : Items"
 
         // add back arrow to toolbar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -48,7 +55,7 @@ class MainActivityTodoItem : AppCompatActivity(), OnTodoItemChangeListener {
         btnAddList.setOnClickListener {
             // Trigger activity to add new ToDo item
             val intent = Intent(this, AddTodoItemActivity::class.java)
-            intent.putExtra("LIST_ID", 0) // Adjust if necessary
+            intent.putExtra("LIST_ID", listIdFk) // Adjust if necessary
             startActivity(intent)
         }
 
@@ -61,15 +68,15 @@ class MainActivityTodoItem : AppCompatActivity(), OnTodoItemChangeListener {
     }
 
     private fun loadCounters() {
-        val totalItems = dbHelper.getTodoCount()
-        val completedItems = dbHelper.getCompletedTodoCount()
+        val totalItems = dbHelper.getTodoCount(listIdFk)
+        val completedItems = dbHelper.getCompletedTodoCount(listIdFk)
         todoCounter.text = "Total Items: $totalItems"
         completedCounter.text = "Completed Items: $completedItems"
     }
 
     private fun loadTodoItems() {
         // Fetch all todo items from the database
-        val todoItems: List<TodoItem> = dbHelper.getAllTodoItems()
+        val todoItems: List<TodoItem> = dbHelper.getTodoItemsForList(listIdFk)
 
         val listViewTodoItems = findViewById<ListView>(R.id.listViewTodoLists)
         val emptyView = findViewById<TextView>(android.R.id.empty)
@@ -90,6 +97,7 @@ class MainActivityTodoItem : AppCompatActivity(), OnTodoItemChangeListener {
     override fun onResume() {
         super.onResume()
         loadTodoItems() // Reload the lists when returning to this activity
+        loadCounters()
     }
 
     override fun onItemChanged() {

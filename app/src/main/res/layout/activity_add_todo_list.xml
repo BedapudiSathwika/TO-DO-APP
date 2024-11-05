@@ -31,19 +31,6 @@
             android:inputType="text"
             android:padding="8dp" />
 
-        <TextView
-            android:layout_marginTop="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Due Date (Optional)" />
-        <TextView
-            android:id="@+id/tvDueDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="mm//dd/yyyy"
-            android:padding="15dp"
-            android:background="@drawable/backborder"/>
-
         <Button
             android:id="@+id/btnAddItem"
             android:layout_marginTop="20dp"

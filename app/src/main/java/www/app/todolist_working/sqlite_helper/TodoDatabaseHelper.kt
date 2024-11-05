@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import www.app.todolist_working.data_class.TodoItem
+import www.app.todolist_working.data_class.TodoList
 
 class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
@@ -54,6 +55,56 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         onCreate(db)
     }
 
+    //START - TO DO LIST
+    fun insertTodoList(name: String): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("name", name)
+        }
+        return db.insert("todo_lists", null, values)
+    }
+
+    @SuppressLint("Range")
+    fun getTodoLists(): List<TodoList> {
+        val lists = mutableListOf<TodoList>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM todo_lists", null)
+        if (cursor.moveToFirst()) {
+            do {
+                val listId = cursor.getInt(cursor.getColumnIndex("id"))
+                val name = cursor.getString(cursor.getColumnIndex("name"))
+
+                Log.d("Database LIST", "Todo listId - ID: $listId, Name: $name")
+                lists.add(TodoList(listId, name))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return lists
+    }
+
+    @SuppressLint("Range")
+    fun getTodoItemsForList(listId: Int): List<TodoItem> {
+        val items = mutableListOf<TodoItem>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM todo_items WHERE list_id_fk = ? ORDER BY due_date ASC", arrayOf(listId.toString()))
+        if (cursor.moveToFirst()) {
+            do {
+                val itemId = cursor.getInt(cursor.getColumnIndex("item_id")) // Correct column name
+                val name = cursor.getString(cursor.getColumnIndex("item_name")) // Update this line
+                val dueDate = cursor.getString(cursor.getColumnIndex("due_date")) // Correct column name
+                val completed = cursor.getInt(cursor.getColumnIndex("completed")) // Correct column name
+                val listIdFk = cursor.getInt(cursor.getColumnIndex("list_id_fk")) // Correct column name
+
+                val todoItem = TodoItem(itemId, name, dueDate, completed, listIdFk)
+                items.add(todoItem)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return items
+    }
+    //END - TO DO LIST
+
 
     // Method to insert a new todo item
     fun insertTodoItem(itemName: String, dueDate: String, listIdFk: Int): Long {
@@ -66,32 +117,6 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         val result = db.insert(TABLE_TODO_ITEMS, null, contentValues)
         db.close()
         return result // Returns the row ID of the newly inserted row, or -1 if an error occurred
-    }
-
-
-
-    // Method to get all todo lists
-    @SuppressLint("Range")
-    fun getAllTodoItems(): List<TodoItem> {
-        val itemList = mutableListOf<TodoItem>()
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM todo_items ORDER BY due_date ASC", null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                val itemId = cursor.getInt(cursor.getColumnIndex("item_id")) // Correct column name
-                val name = cursor.getString(cursor.getColumnIndex("item_name")) // Update this line
-                val dueDate = cursor.getString(cursor.getColumnIndex("due_date")) // Correct column name
-                val completed = cursor.getInt(cursor.getColumnIndex("completed")) // Correct column name
-                val listIdFk = cursor.getInt(cursor.getColumnIndex("list_id_fk")) // Correct column name
-
-                val todoItem = TodoItem(itemId, name, dueDate, completed, listIdFk)
-                itemList.add(todoItem)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return itemList
     }
 
     //Update checkbox
@@ -152,16 +177,31 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         db.close()
     }
 
-    fun getNearestDueDateForList(listId: Int): String? {
+    fun getNearestDueDateForList_Item(itemId: Int): String? {
         val db = this.readableDatabase
         val query = "SELECT due_date FROM todo_items WHERE item_id = ? ORDER BY due_date ASC LIMIT 1"
-        db.rawQuery(query, arrayOf(listId.toString())).use { cursor ->
+        db.rawQuery(query, arrayOf(itemId.toString())).use { cursor ->
             if (cursor.moveToFirst()) {
                 return cursor.getString(cursor.getColumnIndexOrThrow("due_date"))
             }
         }
         return null
     }
+
+    fun getNearestDueDateList(listId: Int): String? {
+        val db = this.readableDatabase
+        var nearestDueDate: String? = null
+        val query = "SELECT due_date FROM todo_items WHERE list_id_fk = ? ORDER BY due_date ASC LIMIT 1"
+        val cursor = db.rawQuery(query, arrayOf(listId.toString()))
+
+        if (cursor.moveToFirst()) {
+            nearestDueDate = cursor.getString(0) // Get the first column (due_date)
+        }
+
+        cursor.close()
+        return nearestDueDate
+    }
+
 
 
 
@@ -200,22 +240,31 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         }
     }
 
-    fun getTodoCount(): Int {
+    fun getTodoCount(listId: Int): Int {
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT COUNT(*) FROM todo_items", null)
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM todo_items WHERE list_id_fk = ?", arrayOf(listId.toString()))
         cursor.moveToFirst()
         val count = cursor.getInt(0)
         cursor.close()
         return count
     }
 
-    fun getCompletedTodoCount(): Int {
+    fun getCompletedTodoCount(listId: Int): Int {
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT COUNT(*) FROM todo_items WHERE completed = 1", null)
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM todo_items WHERE completed = 1 AND list_id_fk = ?", arrayOf(listId.toString()))
         cursor.moveToFirst()
         val count = cursor.getInt(0)
         cursor.close()
         return count
     }
+
+    fun moveTodoItemToList(itemId: Int, newListId: Int): Boolean {
+        val db = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put("list_id_fk", newListId) // Update the list ID
+        }
+        return db.update("todo_items", contentValues, "item_id = ?", arrayOf(itemId.toString())) > 0
+    }
+
 
 }

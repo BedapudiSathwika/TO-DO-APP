@@ -16,6 +16,9 @@
             android:name=".EditTodoItemActivity"
             android:exported="false" />
         <activity
+            android:name="AddTodoIListActivity"
+            android:exported="false"/>
+        <activity
             android:name=".AddTodoItemActivity"
             android:exported="false" />
         <activity
