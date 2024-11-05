@@ -10,11 +10,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <TextView
-        android:id="@+id/todoItemName"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="16dp"
-        android:textSize="16sp"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/todoItemName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:maxLines="1" /> <!-- Optional: Limit to one line -->
+
+        <TextView
+            android:id="@+id/todoItemDueDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageviewDelete"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/delete_24"/>
+
 </LinearLayout>

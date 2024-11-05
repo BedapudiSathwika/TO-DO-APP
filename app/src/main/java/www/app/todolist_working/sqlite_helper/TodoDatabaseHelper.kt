@@ -94,7 +94,8 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return itemList
     }
 
-    fun updateTodoItem(todoItem: TodoItem) {
+    //Update checkbox
+    fun updateCheckboxTodoItem(todoItem: TodoItem) {
         val db = this.writableDatabase
         val contentValues = ContentValues()
         contentValues.put("completed", todoItem.completed)
@@ -102,6 +103,36 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         // Update the todo item in the database
         db.update("todo_items", contentValues, "item_id = ?", arrayOf(todoItem.itemId.toString()))
         db.close()
+    }
+
+    //Delete To Do Item
+    fun deleteTodoItem(itemId: Int): Boolean {
+        val db = this.writableDatabase
+
+        // Delete the item from the database where item_id matches
+        val rowsAffected = db.delete("todo_items", "item_id = ?", arrayOf(itemId.toString()))
+
+        db.close() // Close the database connection
+
+        // Return true if the delete was successful (rowsAffected > 0), otherwise false
+        return rowsAffected > 0
+    }
+
+    //Edit name and due date of item
+    fun editTodoItem(itemId: Int, newName: String, newDueDate: String): Boolean {
+        val db = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put("item_name", newName) // Update item_name
+            put("due_date", newDueDate) // Update due_date
+        }
+
+        // Update the item in the database where item_id matches
+        val rowsAffected = db.update("todo_items", contentValues, "item_id = ?", arrayOf(itemId.toString()))
+
+        db.close() // Close the database connection
+
+        // Return true if the update was successful (rowsAffected > 0), otherwise false
+        return rowsAffected > 0
     }
 
 
@@ -188,4 +219,23 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
             db.close() // Ensure the database is closed in case of any exceptions
         }
     }
+
+    fun getTodoCount(): Int {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM todo_items", null)
+        cursor.moveToFirst()
+        val count = cursor.getInt(0)
+        cursor.close()
+        return count
+    }
+
+    fun getCompletedTodoCount(): Int {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM todo_items WHERE completed = 1", null)
+        cursor.moveToFirst()
+        val count = cursor.getInt(0)
+        cursor.close()
+        return count
+    }
+
 }

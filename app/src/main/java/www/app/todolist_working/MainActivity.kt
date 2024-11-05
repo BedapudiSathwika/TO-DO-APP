@@ -9,16 +9,20 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import www.app.todolist_working.custom_adapter.OnTodoItemChangeListener
 import www.app.todolist_working.custom_adapter.TodoItemAdapter
 import www.app.todolist_working.data_class.TodoItem
 import www.app.todolist_working.sqlite_helper.TodoDatabaseHelper
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnTodoItemChangeListener {
 
     private lateinit var dbHelper: TodoDatabaseHelper
     private lateinit var listViewTodoLists: ListView
     private lateinit var emptyView: TextView
+
+    private lateinit var todoCounter: TextView
+    private lateinit var completedCounter: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +33,9 @@ class MainActivity : AppCompatActivity() {
         val btnAddList = findViewById<Button>(R.id.btnAddList)
         listViewTodoLists = findViewById(R.id.listViewTodoLists)
         emptyView = findViewById(android.R.id.empty)
+
+        todoCounter = findViewById(R.id.todoCounter)
+        completedCounter = findViewById(R.id.completedCounter)
 
         btnAddList.setOnClickListener {
             // Trigger activity to add new ToDo item
@@ -41,6 +48,23 @@ class MainActivity : AppCompatActivity() {
         loadTodoItems()
         dbHelper.logAllData() // Log all data from the database
         dbHelper.logTableSchema()
+
+        loadCounters()
+    }
+
+    // Call this method to refresh the counters after changes
+    fun updateCounters() {
+        val totalItems = dbHelper.getTodoCount()
+        val completedItems = dbHelper.getCompletedTodoCount()
+        todoCounter.text = "Total Items: $totalItems"
+        completedCounter.text = "Completed Items: $completedItems"
+    }
+
+    private fun loadCounters() {
+        val totalItems = dbHelper.getTodoCount()
+        val completedItems = dbHelper.getCompletedTodoCount()
+        todoCounter.text = "Total Items: $totalItems"
+        completedCounter.text = "Completed Items: $completedItems"
     }
 
     private fun loadTodoItems() {
@@ -58,38 +82,19 @@ class MainActivity : AppCompatActivity() {
             emptyView.visibility = View.GONE
 
             // Set up custom adapter for ListView, passing the dbHelper
-            val adapter = TodoItemAdapter(this, todoItems, dbHelper)
+            val adapter = TodoItemAdapter(this, todoItems, dbHelper,this)
             listViewTodoItems.adapter = adapter
         }
     }
 
-
-
-//    private fun loadTodoItems() {
-//        // Fetch all todo items from the database
-//        val todoItems: List<TodoItem> = dbHelper.getAllTodoItems()
-//
-//        val listViewTodoItems = findViewById<ListView>(R.id.listViewTodoLists)
-//        val emptyView = findViewById<TextView>(android.R.id.empty)
-//
-//        if (todoItems.isEmpty()) {
-//            listViewTodoItems.visibility = View.GONE
-//            emptyView.visibility = View.VISIBLE
-//        } else {
-//            listViewTodoItems.visibility = View.VISIBLE
-//            emptyView.visibility = View.GONE
-//
-//            // Set up adapter for ListView
-//            val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, todoItems.map { "${it.name} - Due: ${it.dueDate}" })
-//            listViewTodoItems.adapter = adapter
-//        }
-//    }
-
-
-
     override fun onResume() {
         super.onResume()
         loadTodoItems() // Reload the lists when returning to this activity
+    }
+
+    override fun onItemChanged() {
+        loadCounters() // Refresh counters
+        loadTodoItems() // Refresh the todo list if needed
     }
 
 }
