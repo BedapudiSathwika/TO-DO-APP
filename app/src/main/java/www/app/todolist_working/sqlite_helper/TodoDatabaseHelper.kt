@@ -109,10 +109,23 @@ class TodoDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     // Method to insert a new todo item
     fun insertTodoItem(itemName: String, dueDate: String, listIdFk: Int): Long {
         val db = this.writableDatabase
+        val cursor = db.rawQuery(
+            "SELECT * FROM $TABLE_TODO_ITEMS WHERE $COLUMN_ITEM_NAME = ?",
+            arrayOf(itemName)
+        )
+
+        if (cursor.count > 0) {
+            cursor.close()
+            db.close()
+            return -1 // Indicate that the item was not inserted due to a duplicate name
+        }
+
+        // Close cursor if no similar item was found and proceed with insertion
+        cursor.close()
         val contentValues = ContentValues().apply {
             put(COLUMN_ITEM_NAME, itemName)
             put(COLUMN_ITEM_DUE_DATE, dueDate) // If your table supports due date
-            put(COLUMN_LIST_ID_FK, listIdFk) // Add this line to insert the foreign key
+            put(COLUMN_LIST_ID_FK, listIdFk) // Insert the foreign key
         }
         val result = db.insert(TABLE_TODO_ITEMS, null, contentValues)
         db.close()

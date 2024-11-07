@@ -60,7 +60,8 @@ class AddTodoItemActivity : AppCompatActivity() {
                     Toast.makeText(this, "Todo item added successfully!", Toast.LENGTH_SHORT).show()
                     finish() // Optionally finish this activity to go back
                 } else {
-                    Toast.makeText(this, "Error adding todo item.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Item already exists.", Toast.LENGTH_SHORT).show()
+                    finish() // Optionally finish this activity to go back
                 }
             } else {
                 Toast.makeText(this, "Invalid List ID.", Toast.LENGTH_SHORT).show()
